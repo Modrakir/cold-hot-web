@@ -61,4 +61,13 @@ class GameController {
             alert('Игра не найдена!');
         }
     }
+
+    async viewGame(id) {
+        const gameData = await this.model.loadGame(id);
+        if (gameData) {
+            this.view.showReplay(gameData);
+        } else {
+            alert('Игра не найдена!');
+        }
+    }
 }

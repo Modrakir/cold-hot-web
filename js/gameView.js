@@ -99,6 +99,10 @@ class GameView {
                 this.showScreen('welcome');
             }
         });
+
+        document.getElementById('backFromGame').addEventListener('click', () => {
+            this.showGamesList();
+        });
     }
 
     showScreen(screenName) {
@@ -238,23 +242,29 @@ class GameView {
     }
 
     async showGamesList() {
-        const games = await this.onShowGamesList();
+        try {
+            const games = await this.onShowGamesList();
 
-        if (games.length === 0) {
-            this.elements.gamesList.innerHTML = '<p>Нет сохраненных игр</p>';
-        } else {
+            if (!games || games.length === 0) {
+                this.elements.gamesList.innerHTML = '<p class="text-center">Нет сохраненных игр</p>';
+                return;
+            }
+
             this.elements.gamesList.innerHTML = games.map(game => `
-                <div class="game-item ${game.outcome === 'won' ? 'won' : 'lost'}" 
-                     onclick="gameController.replayGame(${game.id})">
-                    <strong>Игра #${game.id}</strong> - ${new Date(game.date).toLocaleString()}<br>
-                    Игрок: ${game.player_name} | Число: ${game.secret_number}<br>
-                    Результат: ${game.outcome === 'won' ? 'Победа' : 'Поражение'} | 
-                    Попыток: ${game.attempts ? game.attempts.length : 0}
-                </div>
-            `).join('');
-        }
+            <div class="game-item ${game.outcome === 'won' ? 'won' : 'lost'}" 
+                 onclick="gameController.replayGame(${game.id})">
+                <strong>Игра #${game.id}</strong> - ${new Date(game.date).toLocaleString()}<br>
+                Игрок: ${game.player_name} | Число: ${game.secret_number}<br>
+                Результат: ${game.outcome === 'won' ? '🎉 Победа' : '💔 Поражение'} | 
+                Попыток: ${game.attempts ? game.attempts.length : 0}
+            </div>
+        `).join('');
 
-        this.showScreen('list');
+            this.showScreen('list');
+        } catch (error) {
+            console.error('Ошибка при загрузке списка игр:', error);
+            this.elements.gamesList.innerHTML = '<p class="text-center">Ошибка при загрузке списка игр</p>';
+        }
     }
 
     showReplay(gameData) {
@@ -274,13 +284,12 @@ class GameView {
         this.elements.submitGuess.disabled = true;
         this.isGameActive = false;
 
-        this.showScreen('game');
-
-        // Показываем результат в модальном окне
-        if (gameData.outcome === 'won') {
-            this.showWin(gameData.attempts.length, gameData.secret_number);
-        } else {
-            this.showLoss(gameData.attempts.length, gameData.secret_number);
+        // Добавляем индикатор режима просмотра
+        const gameHeader = document.querySelector('.game-header h2');
+        if (gameHeader) {
+            gameHeader.innerHTML = `Просмотр игры: <span id="currentPlayer">${gameData.player_name}</span> <small>(Режим просмотра)</small>`;
         }
+
+        this.showScreen('game');
     }
 }

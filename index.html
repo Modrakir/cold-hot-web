@@ -40,7 +40,10 @@
         <!-- Экран игры -->
         <div id="gameScreen" class="screen">
             <div class="game-header">
-                <h2>Игрок: <span id="currentPlayer"></span></h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <h2>Игрок: <span id="currentPlayer"></span></h2>
+                    <button id="backFromGame" class="btn" style="margin-left: auto;">Назад к списку</button>
+                </div>
                 <div class="game-info">
                     <span>Попыток: <span id="attemptsCount">0</span>/10</span>
                     <span>Число: <span id="secretNumber">???</span></span>
